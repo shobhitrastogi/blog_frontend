@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-
+const backend_api = "https://blog-backend-kjbu.onrender.com"
 export const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,7 +27,7 @@ export const Register = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${backend_api}`+"/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

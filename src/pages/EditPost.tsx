@@ -1,26 +1,63 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
-export const CreatePost = () => {
+export const EditPost = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
   });
 
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`https://blog-backend-kjbu.onrender.com/api/posts/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setFormData({
+            title: data.title,
+            content: data.content,
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: data.message || "Failed to fetch post",
+          });
+          navigate("/");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred while fetching the post",
+        });
+        navigate("/");
+      }
+    };
+
+    fetchPost();
+  }, [id, navigate, toast]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch("https://blog-backend-kjbu.onrender.com/api/posts", {
-        method: "POST",
+      const response = await fetch(`http://localhost:5000/api/posts/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -32,21 +69,21 @@ export const CreatePost = () => {
       if (response.ok) {
         toast({
           title: "Success",
-          description: "Post created successfully!",
+          description: "Post updated successfully!",
         });
         navigate("/");
       } else {
         toast({
           variant: "destructive",
           title: "Error",
-          description: data.message || "Failed to create post",
+          description: data.message || "Failed to update post",
         });
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An error occurred while creating the post",
+        description: "An error occurred while updating the post",
       });
     }
   };
@@ -55,7 +92,7 @@ export const CreatePost = () => {
     <div className="container mx-auto py-8">
       <Card>
         <CardHeader>
-          <CardTitle>Create New Post</CardTitle>
+          <CardTitle>Edit Post</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +123,7 @@ export const CreatePost = () => {
               <Button variant="outline" onClick={() => navigate("/")}>
                 Cancel
               </Button>
-              <Button type="submit">Create Post</Button>
+              <Button type="submit">Update Post</Button>
             </div>
           </form>
         </CardContent>
@@ -95,4 +132,4 @@ export const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default EditPost;
