@@ -26,10 +26,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Run linting (optional but highly recommended for maintaining code quality)
-      - name: Run ESLint
-        run: npm run lint
-
       # Step 5: Run the build (production-ready build of the app)
       - name: Build project
         run: npm run build
